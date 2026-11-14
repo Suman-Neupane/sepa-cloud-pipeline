@@ -8,10 +8,12 @@ Validates:
 4. German Anti-Money Laundering Act (Geldwäschegesetz - GwG) threshold (>= 10,000 EUR).
 """
 
+from __future__ import annotations
+
 import re
 from datetime import datetime, timezone
-from decimal import Decimal, ROUND_HALF_UP
-from typing import Any, Dict
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Any
 
 GERMAN_IBAN_REGEX = re.compile(r"^DE\d{20}$")
 GERMAN_VAT_RATE = Decimal("0.19")
@@ -41,7 +43,7 @@ def _to_cents(value: Any) -> Decimal:
         raise InvoiceValidationError(f"Invalid numeric amount: {value}") from exc
 
 
-def validate_sepa_invoice(payload: Dict[str, Any]) -> Dict[str, Any]:
+def validate_sepa_invoice(payload: dict[str, Any]) -> dict[str, Any]:
     """
     Validate a SEPA invoice dictionary and return an enriched audit record.
 
@@ -53,9 +55,7 @@ def validate_sepa_invoice(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     missing = REQUIRED_FIELDS - set(payload.keys())
     if missing:
-        raise InvoiceValidationError(
-            f"Missing required SEPA fields: {sorted(missing)}"
-        )
+        raise InvoiceValidationError(f"Missing required SEPA fields: {sorted(missing)}")
 
     invoice_id = str(payload["invoice_id"]).strip()
     if not invoice_id:

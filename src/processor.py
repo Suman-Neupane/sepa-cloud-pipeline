@@ -11,10 +11,12 @@ Connects to AWS (or Official AWS Emulator on port 9297):
    automatically moves them to the Dead-Letter Queue (DLQ) after 3 attempts.
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any
 
 import boto3
 import urllib3
@@ -29,10 +31,10 @@ logger = logging.getLogger(__name__)
 class InvoiceEventProcessor:
     """Processes incoming SEPA invoice events across S3, SQS, DynamoDB, and SNS."""
 
-    def __init__(self, config: Optional[AppConfig] = None) -> None:
+    def __init__(self, config: AppConfig | None = None) -> None:
         self.config = config or AppConfig()
 
-        client_kwargs: Dict[str, Any] = {
+        client_kwargs: dict[str, Any] = {
             "region_name": self.config.aws_region,
             "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID", "test"),
             "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY", "test"),
@@ -54,7 +56,7 @@ class InvoiceEventProcessor:
         response = self.sns.create_topic(Name=topic_name)
         return response["TopicArn"]
 
-    def process_single_message(self) -> Dict[str, Any]:
+    def process_single_message(self) -> dict[str, Any]:
         """
         Poll one message from the primary SQS queue and process it end-to-end.
 

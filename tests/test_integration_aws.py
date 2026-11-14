@@ -29,7 +29,9 @@ def _drain_queue(sqs_client, queue_url: str) -> None:
         if not messages:
             break
         for msg in messages:
-            sqs_client.delete_message(QueueUrl=queue_url, ReceiptHandle=msg["ReceiptHandle"])
+            sqs_client.delete_message(
+                QueueUrl=queue_url, ReceiptHandle=msg["ReceiptHandle"]
+            )
 
 
 @pytest.fixture
@@ -164,9 +166,9 @@ def test_e2e_poison_pill_message_routes_to_dlq_after_3_retries(
     # Attempt 1, 2, and 3 should all fail validation
     for attempt in range(1, 4):
         res = processor.process_single_message()
-        assert (
-            res["status"] == "FAILED_VALIDATION"
-        ), f"Expected failure on attempt {attempt}"
+        assert res["status"] == "FAILED_VALIDATION", (
+            f"Expected failure on attempt {attempt}"
+        )
 
     # Attempt 4 on main queue should be EMPTY because SQS moved it to the DLQ!
     empty_res = processor.process_single_message()
