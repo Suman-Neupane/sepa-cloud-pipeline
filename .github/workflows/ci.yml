@@ -74,14 +74,19 @@ jobs:
 
       - name: Build & Start Official AWS Emulator Container (Port 9297)
         run: |
-          mkdir -p "$HOME/.aws/emulator"
           docker build --build-arg TARGETARCH=amd64 -t aws-emulator -f docker/emulator.Dockerfile .
           docker run -d --name aws-emulator \
             --memory=2g --memory-swap=2g \
             -p 127.0.0.1:9297:9297 \
-            -v "$HOME/.aws/emulator:/home/emulator/.aws/emulator" \
             aws-emulator -p 9297 -a off
-          sleep 3
+          for i in {1..30}; do
+            if curl -k -s https://127.0.0.1:9297/__admin/health | grep -q "ok"; then
+              echo "AWS Emulator is healthy!"
+              break
+            fi
+            echo "Waiting for AWS Emulator..."
+            sleep 1
+          done
           docker ps
 
       - name: Setup Terraform
