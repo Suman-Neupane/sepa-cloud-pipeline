@@ -27,3 +27,8 @@ output "worker_iam_role_arn" {
   description = "ARN of the least-privilege IAM role for the invoice processor worker"
   value       = aws_iam_role.processor_worker_role.arn
 }
+
+output "kms_cmk_arn" {
+  description = "ARN of the Customer Managed Key (CMK) for GDPR/FinTech encryption"
+  value       = aws_kms_key.fintech_kms_key.arn
+}

@@ -1,4 +1,18 @@
 # ==============================================================================
+# 0. AWS KMS: Customer Managed Key (CMK) with Automatic Annual Key Rotation
+# ==============================================================================
+resource "aws_kms_key" "fintech_kms_key" {
+  description             = "Customer Managed Key (CMK) for SEPA FinTech pipeline encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}
+
+resource "aws_kms_alias" "fintech_kms_alias" {
+  name          = "alias/${var.project_name}-key-${var.environment}"
+  target_key_id = aws_kms_key.fintech_kms_key.key_id
+}
+
+# ==============================================================================
 # 1. AMAZON S3: Encrypted & Private Raw SEPA Invoice Storage
 # ==============================================================================
 resource "aws_s3_bucket" "invoices" {
@@ -18,7 +32,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "invoices_encrypti
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.fintech_kms_key.arn
     }
   }
 }
@@ -74,6 +89,10 @@ resource "aws_dynamodb_table" "invoice_audit" {
   point_in_time_recovery {
     enabled = true
   }
+
+  lifecycle {
+    ignore_changes = [billing_mode, point_in_time_recovery, on_demand_throughput]
+  }
 }
 
 # ==============================================================================
@@ -81,7 +100,7 @@ resource "aws_dynamodb_table" "invoice_audit" {
 # ==============================================================================
 resource "aws_sns_topic" "aml_alerts" {
   name              = "${var.project_name}-aml-alerts-${var.environment}"
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = aws_kms_key.fintech_kms_key.arn
 }
 
 # ==============================================================================
@@ -138,6 +157,16 @@ data "aws_iam_policy_document" "worker_least_privilege" {
     effect    = "Allow"
     actions   = ["sns:Publish"]
     resources = [aws_sns_topic.aml_alerts.arn]
+  }
+
+  statement {
+    sid    = "KMSDecryptionAndEncryption"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [aws_kms_key.fintech_kms_key.arn]
   }
 }
 

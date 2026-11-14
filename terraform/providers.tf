@@ -34,6 +34,7 @@ provider "aws" {
       sns      = var.emulator_endpoint
       iam      = var.emulator_endpoint
       sts      = var.emulator_endpoint
+      kms      = var.emulator_endpoint
     }
   }
 
