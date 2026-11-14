@@ -63,3 +63,9 @@ make test-unit
 # Full end-to-end S3 -> SQS -> DynamoDB -> SNS + DLQ Chaos tests
 make test-e2e
 ```
+
+### 4. Launch the Interactive Operations Dashboard (Web UI)
+```bash
+make ui
+```
+Open **[http://localhost:8000](http://localhost:8000)** in your browser to view the live AWS Emulator status, trigger 1-click invoice test simulations, inspect the SQS Dead-Letter Queue (DLQ), and monitor the DynamoDB compliance audit ledger in real-time!

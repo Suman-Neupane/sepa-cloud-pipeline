@@ -50,3 +50,6 @@ test-e2e: ## Run end-to-end AWS Emulator integration & DLQ chaos tests
 lint: ## Run Ruff Python linter & Terraform formatting check
 	ruff check src/ tests/
 	cd terraform && terraform fmt -check
+
+ui: ## Start the Interactive Visual Web Dashboard on http://localhost:8000
+	.venv/bin/uvicorn src.dashboard:app --host 127.0.0.1 --port 8000 --reload
