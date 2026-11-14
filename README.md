@@ -1,8 +1,9 @@
 # Event-Driven SEPA Invoice & AML Compliance Pipeline (AWS Emulator + Terraform + DevSecOps)
 
-[![CI/CD Pipeline](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?logo=github-actions&logoColor=white)](#)
+[![CI/CD Pipeline](https://github.com/Suman-Neupane/sepa-cloud-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/Suman-Neupane/sepa-cloud-pipeline/actions/workflows/ci.yml)
 [![IaC](https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform&logoColor=white)](#)
 [![Cloud](https://img.shields.io/badge/Cloud-AWS_Emulator_(:9297)-FF9900?logo=amazonaws&logoColor=white)](#)
+[![Security](https://img.shields.io/badge/Security-Trivy_Clean-green?logo=aqua&logoColor=white)](#)
 [![Region](https://img.shields.io/badge/Region-eu--central--1_(Frankfurt)-0052CC)](#)
 
 An enterprise-grade, event-driven cloud-native pipeline designed for **German/EU FinTech compliance**. It processes incoming **SEPA invoices**, validates German IBANs (`DE...`) and **19% Mehrwertsteuer (MwSt / VAT)** calculations, enforces **German Anti-Money Laundering (Geldwäschegesetz - GwG)** reporting thresholds ($\ge$ 10,000 EUR), and isolates poison-pill messages via **Amazon SQS Dead-Letter Queues (DLQ)**.
